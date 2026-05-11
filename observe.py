@@ -137,7 +137,7 @@ def _get_stream_url(yt_url: str) -> str | None:
             r = subprocess.run(
                 [sys.executable, "-m", "yt_dlp", "-f", fmt, "-g",
                  "--no-playlist", "--no-warnings", "--no-check-certificates",
-                 "--user-agent", "Mozilla/5.0 Chrome/120.0",
+                 "--extractor-args", "youtube:player_client=android,web",
                  yt_url],
                 capture_output=True, timeout=60
             )
