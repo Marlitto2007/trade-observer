@@ -1,8 +1,0 @@
-[phases.setup]
-nixPkgs = ["python313", "deno", "tesseract"]
-
-[phases.install]
-cmds = ["pip install -r requirements.txt"]
-
-[start]
-cmd = "python observe.py"
