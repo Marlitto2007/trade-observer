@@ -131,17 +131,24 @@ def _ffmpeg_bin():
 YOUTUBE_URL    = os.getenv("YOUTUBE_STREAM_URL", "")
 
 def _get_stream_url(yt_url: str) -> str | None:
-    """Use yt-dlp to resolve best video-only stream URL from a YouTube URL."""
-    try:
-        r = subprocess.run(
-            [sys.executable, "-m", "yt_dlp", "-f", "96", "-g", "--no-playlist", yt_url],
-            capture_output=True, timeout=30
-        )
-        if r.returncode == 0:
-            return r.stdout.decode().strip().splitlines()[0]
-        err = r.stderr.decode(errors="replace").strip()[-200:]
-        print(f"  [Stream] yt-dlp failed: {err}")
-        return None
+    r = None
+    for fmt in ["best[height<=1080]/best", "best", "worst"]:
+        try:
+            r = subprocess.run(
+                [sys.executable, "-m", "yt_dlp", "-f", fmt, "-g",
+                 "--no-playlist", "--no-warnings", "--no-check-certificates",
+                 "--user-agent", "Mozilla/5.0 Chrome/120.0",
+                 yt_url],
+                capture_output=True, timeout=60
+            )
+            if r.returncode == 0:
+                out = r.stdout.decode().strip().splitlines()
+                if out: return out[0]
+        except Exception as e:
+            print(f"  [Stream] attempt failed: {e}")
+    err = r.stderr.decode(errors="replace")[-300:] if r else "none"
+    print(f"  [Stream] yt-dlp failed: {err}")
+    return None
     except FileNotFoundError:
         print("  [Stream] yt-dlp not found — run: pip install yt-dlp")
         return None
