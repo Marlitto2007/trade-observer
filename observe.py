@@ -185,6 +185,7 @@ def take_screenshot() -> "Image.Image | None":
             capture_output=True, timeout=90
         )
         if r.returncode != 0 or not Path(TMP_SCREENSHOT).exists():
+            print(f"  [FFMPEG DEBUG] rc={r.returncode} file_exists={Path(TMP_SCREENSHOT).exists()} stream_prefix={stream[:80]}")
             # stream URL may have expired — force refresh next time
             _stream_url_cache["url"] = None
             err = r.stderr.decode(errors="replace").strip()
