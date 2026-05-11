@@ -1,0 +1,7 @@
+numpy
+pillow
+scipy
+requests
+pytesseract
+yt-dlp
+imageio-ffmpeg
