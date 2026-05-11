@@ -187,7 +187,8 @@ def take_screenshot() -> "Image.Image | None":
         if r.returncode != 0 or not Path(TMP_SCREENSHOT).exists():
             # stream URL may have expired — force refresh next time
             _stream_url_cache["url"] = None
-            err = r.stderr.decode(errors="replace").strip()[-150:]
+            err = r.stderr.decode(errors="replace").strip()
+            print(f"  [Stream] ffmpeg rc={r.returncode} err={err[:600]}")
             print(f"  [Stream] ffmpeg failed: {err}")
             return None
         return Image.open(TMP_SCREENSHOT).convert("RGB")
