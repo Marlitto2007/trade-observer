@@ -179,9 +179,10 @@ def take_screenshot() -> "Image.Image | None":
         r = subprocess.run(
             [_ffmpeg_bin(), "-y",
              "-allowed_extensions", "ALL",
+             "-reconnect", "1", "-reconnect_streamed", "1",
              "-i", stream,
-             "-vframes", "1", "-q:v", "2", TMP_SCREENSHOT],
-            capture_output=True, timeout=30
+             "-t", "2", "-vframes", "1", "-q:v", "2", TMP_SCREENSHOT],
+            capture_output=True, timeout=90
         )
         if r.returncode != 0 or not Path(TMP_SCREENSHOT).exists():
             # stream URL may have expired — force refresh next time
