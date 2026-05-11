@@ -177,8 +177,10 @@ def take_screenshot() -> "Image.Image | None":
         return None
     try:
         r = subprocess.run(
-            [_ffmpeg_bin(), "-y", "-i", stream,
-             "-vframes", "1", "-q:v", "2", "-update", "1", TMP_SCREENSHOT],
+            [_ffmpeg_bin(), "-y",
+             "-allowed_extensions", "ALL",
+             "-i", stream,
+             "-vframes", "1", "-q:v", "2", TMP_SCREENSHOT],
             capture_output=True, timeout=30
         )
         if r.returncode != 0 or not Path(TMP_SCREENSHOT).exists():
