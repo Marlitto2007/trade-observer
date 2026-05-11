@@ -3,3 +3,7 @@ observe_calibrate.png
 observe_signals/
 *.pyc
 __pycache__/
+
+edge_tmp/
+youtube_cookies.txt
+
