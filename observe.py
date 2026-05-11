@@ -131,13 +131,27 @@ def _ffmpeg_bin():
 YOUTUBE_URL    = os.getenv("YOUTUBE_STREAM_URL", "")
 
 def _get_stream_url(yt_url: str) -> str | None:
+    # Try streamlink first (better datacenter IP support)
+    try:
+        r2 = subprocess.run(
+            [sys.executable, "-m", "streamlink", "--stream-url", yt_url, "best"],
+            capture_output=True, timeout=30
+        )
+        if r2.returncode == 0:
+            out = r2.stdout.decode().strip()
+            if out.startswith("http"):
+                return out
+    except Exception:
+        pass
+    # Fallback: yt-dlp with multiple clients
     r = None
     for fmt in ["best[height<=1080]/best", "best", "worst"]:
         try:
             r = subprocess.run(
-                [sys.executable, "-m", "yt_dlp", "-f", fmt, "-g",
-                 "--no-playlist", "--no-warnings", "--no-check-certificates",
-                 "--extractor-args", "youtube:player_client=android,web",
+                [sys.executable, "-m", "yt_dlp",
+                 "-f", fmt, "-g", "--no-playlist", "--no-warnings",
+                 "--no-check-certificates",
+                 "--extractor-args", "youtube:player_client=android,mweb",
                  yt_url],
                 capture_output=True, timeout=60
             )
@@ -145,16 +159,10 @@ def _get_stream_url(yt_url: str) -> str | None:
                 out = r.stdout.decode().strip().splitlines()
                 if out: return out[0]
         except Exception as e:
-            print(f"  [Stream] attempt failed: {e}")
+            print(f"  [Stream] yt-dlp attempt failed: {e}")
     err = r.stderr.decode(errors="replace")[-300:] if r else "none"
     print(f"  [Stream] yt-dlp failed: {err}")
     return None
-    except FileNotFoundError:
-        print("  [Stream] yt-dlp not found — run: pip install yt-dlp")
-        return None
-    except Exception as e:
-        print(f"  [Stream] yt-dlp error: {e}")
-        return None
 
 _stream_url_cache: dict = {"url": None, "ts": 0.0}
 STREAM_URL_TTL = 3600  # re-resolve every hour (live stream URLs expire)

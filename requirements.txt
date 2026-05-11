@@ -5,3 +5,4 @@ requests
 pytesseract
 yt-dlp
 imageio-ffmpeg
+streamlink
