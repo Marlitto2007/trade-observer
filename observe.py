@@ -193,6 +193,7 @@ def take_screenshot() -> "Image.Image | None":
             print(f"  [Stream] ffmpeg failed: {err}")
             return None
         return Image.open(TMP_SCREENSHOT).convert("RGB")
+        print(f"  [FRAME] Got frame {img.size} mode={img.mode}")
     except FileNotFoundError:
         print("  [Stream] ffmpeg not found")
         return None
